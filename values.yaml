@@ -1,0 +1,42 @@
+gitlabUrl: https://gitlab.com
+runnerRegistrationToken: "secrettoken"
+
+rbac:
+  create: true
+tyson@MacBookPro k3d-demo % cat values.yaml 
+gitlabUrl: https://gitlab.com
+runnerRegistrationToken: "secrettoken"
+
+rbac:
+  create: true
+
+runners:
+  # This sets the helper image for the Runner Pod itself (if needed)
+  helpers:
+    image: "registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:arm64-v18.6.1"
+
+  # This configures the Job Pods spawned by the runner
+  config: |
+    [[runners]]
+      name = "k3d-arm64-runner"
+      url = "https://gitlab.com"
+      token = "YOUR_REGISTRATION_TOKEN"
+      executor = "kubernetes"
+      environment = ["FF_USE_LEGACY_KUBERNETES_EXECUTION_STRATEGY=true"]
+
+      [runners.kubernetes]
+        namespace = "gitlab-runner"
+        image = "bitnami/kubectl:latest"
+        privileged = true
+        
+        # CRITICAL: This forces the Helper/Init container to be ARM64
+        helper_image = "registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:arm64-v18.6.1"
+        
+        poll_timeout = 360
+
+        [runners.kubernetes.volumes]
+          [[runners.kubernetes.volumes.secret]]
+            name = "k3d-kubeconfig"
+            mount_path = "/kube"
+            readOnly = true
+            items = [{ key = "config", path = "config" }]
