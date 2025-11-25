@@ -3,12 +3,6 @@ runnerRegistrationToken: "secrettoken"
 
 rbac:
   create: true
-tyson@MacBookPro k3d-demo % cat values.yaml 
-gitlabUrl: https://gitlab.com
-runnerRegistrationToken: "secrettoken"
-
-rbac:
-  create: true
 
 runners:
   # This sets the helper image for the Runner Pod itself (if needed)
