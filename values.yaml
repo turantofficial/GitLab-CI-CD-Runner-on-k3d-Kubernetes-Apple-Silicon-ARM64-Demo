@@ -14,7 +14,7 @@ runners:
     [[runners]]
       name = "k3d-arm64-runner"
       url = "https://gitlab.com"
-      token = "YOUR_REGISTRATION_TOKEN"
+      token = "secrettoken"
       executor = "kubernetes"
       environment = ["FF_USE_LEGACY_KUBERNETES_EXECUTION_STRATEGY=true"]
 
