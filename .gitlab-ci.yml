@@ -1,0 +1,13 @@
+stages:
+  - test
+
+k3d-test:
+  stage: test
+  tags:
+    - k3d-kubernetes-runner
+  image: bitnami/kubectl:latest
+  script:
+    - echo "Hello from k3d!"
+    - kubectl version --client
+    - kubectl get nodes
+
