@@ -1,13 +1,52 @@
 stages:
+  - lint
   - test
+  - build
+  - deploy
+  - verify
+
+
+default:
+  tags:
+    - k3d-kubernetes-runner
+  image: bitnami/kubectl:1.30
+
+before_script:
+  - echo "Using kubectl from image:"
+  - kubectl version --client
+
+lint:
+  stage: lint
+  script:
+    - echo "Running linting..."
+    - yamllint .
 
 k3d-test:
   stage: test
-  tags:
-    - k3d-kubernetes-runner
-  image: bitnami/kubectl:latest
   script:
     - echo "Hello from k3d!"
-    - kubectl version --client
     - kubectl get nodes
+    - kubectl get pods -A
+
+docker-build:
+  stage: build
+  image: docker:27
+  services:
+    - docker:27-dind
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+deploy:
+  stage: deploy
+  script:
+    - kubectl apply -f k8s/deployment.yaml
+    - kubectl rollout status deployment/myapp
+
+verify:
+  stage: verify
+  script:
+    - kubectl get pods
+    - kubectl logs deployment/myapp
+
 
